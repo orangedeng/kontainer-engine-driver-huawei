@@ -96,7 +96,7 @@ func (d *CCEDriver) Create(ctx context.Context, opts *types.DriverOptions, _ *ty
 	elbClient := elb.NewClient(baseClient)
 	cleanUpResources := []string{}
 	info = &types.ClusterInfo{}
-	defer storeState(info, state)
+	defer storeState(info, &state)
 
 	var eipInfo *common.EipInfo
 	var elbInfo *common.LoadBalancerInfo
@@ -104,7 +104,7 @@ func (d *CCEDriver) Create(ctx context.Context, opts *types.DriverOptions, _ *ty
 	//resource cleanup defer
 	defer func() {
 		if rtnerr != nil && len(cleanUpResources) != 0 {
-			deleteResources(ctx, state, cleanUpResources)
+			deleteResources(ctx, &state, cleanUpResources)
 		}
 	}()
 
@@ -209,7 +209,7 @@ func (d *CCEDriver) Update(ctx context.Context, clusterInfo *types.ClusterInfo, 
 
 	state.NodeConfig.NodeCount = newState.NodeConfig.NodeCount
 	logrus.Info("update cluster success")
-	return clusterInfo, storeState(clusterInfo, state)
+	return clusterInfo, storeState(clusterInfo, &state)
 }
 
 // PostCheck does post action after provisioning
@@ -306,7 +306,7 @@ func (d *CCEDriver) Remove(ctx context.Context, clusterInfo *types.ClusterInfo) 
 	if err != nil {
 		return err
 	}
-	deleteResources(ctx, state, []string{"elb", "cluster"})
+	deleteResources(ctx, &state, []string{"elb", "cluster"})
 	return nil
 }
 
@@ -451,8 +451,8 @@ func getHuaweiBaseClient(s state) *common.Client {
 	)
 }
 
-func deleteResources(ctx context.Context, state state, sources []string) {
-	baseClient := getHuaweiBaseClient(state)
+func deleteResources(ctx context.Context, state *state, sources []string) {
+	baseClient := getHuaweiBaseClient(*state)
 	networkClient := network.NewClient(baseClient)
 	cceClient := cce.NewClient(baseClient)
 	elbClient := elb.NewClient(baseClient)
@@ -519,7 +519,7 @@ func getClusterRequestFromState(state state) *common.ClusterInfo {
 	return clusterReq
 }
 
-func storeState(info *types.ClusterInfo, state state) error {
+func storeState(info *types.ClusterInfo, state *state) error {
 	data, err := json.Marshal(state)
 
 	if err != nil {
