@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -18,6 +19,9 @@ const (
 )
 
 func (c *Client) WaitForJobReadyV3(ctx context.Context, duration, timeout time.Duration, jobID string) (bool, *JobInfo, error) {
+	if jobID == "" {
+		return false, nil, errors.New("job id is required")
+	}
 	var lastJobInfo *JobInfo
 	err := CustomWaitForCompleteUntilTrue(ctx, duration, timeout, func(ictx context.Context) (bool, error) {
 		logrus.Infof("Querying job %s for %s", jobID, c.getServiceFunc())

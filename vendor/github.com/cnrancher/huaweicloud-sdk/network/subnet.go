@@ -2,6 +2,7 @@ package network
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/cnrancher/huaweicloud-sdk/common"
@@ -25,6 +26,9 @@ func (c *Client) CreateSubnet(ctx context.Context, request *common.SubnetInfo) (
 }
 
 func (c *Client) GetSubnet(ctx context.Context, id string) (*common.SubnetInfo, error) {
+	if id == "" {
+		return nil, errors.New("subnet id is required")
+	}
 	rtn := common.SubnetInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -40,6 +44,9 @@ func (c *Client) GetSubnet(ctx context.Context, id string) (*common.SubnetInfo, 
 }
 
 func (c *Client) DeleteSubnet(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("subnet id is required")
+	}
 	logrus.Infof("Deleting subnet %s", id)
 	_, err := c.DoRequest(
 		ctx,

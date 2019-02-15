@@ -2,6 +2,7 @@ package network
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/cnrancher/huaweicloud-sdk/common"
@@ -23,6 +24,9 @@ func (c *Client) CreateEIP(ctx context.Context, info *common.EipAllocArg) (*comm
 }
 
 func (c *Client) GetEIP(ctx context.Context, id string) (*common.EipInfo, error) {
+	if id == "" {
+		return nil, errors.New("eip id is required")
+	}
 	rtn := common.EipInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -38,6 +42,9 @@ func (c *Client) GetEIP(ctx context.Context, id string) (*common.EipInfo, error)
 }
 
 func (c *Client) UpdateEIP(ctx context.Context, id string, info *common.EipAssocArg) (*common.EipInfo, error) {
+	if id == "" {
+		return nil, errors.New("eip id is required")
+	}
 	rtn := common.EipInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -53,6 +60,9 @@ func (c *Client) UpdateEIP(ctx context.Context, id string, info *common.EipAssoc
 }
 
 func (c *Client) DeleteEIP(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("eip id is required")
+	}
 	_, err := c.DoRequest(
 		ctx,
 		http.MethodDelete,

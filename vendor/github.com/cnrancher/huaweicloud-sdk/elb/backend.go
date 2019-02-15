@@ -2,6 +2,7 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -9,6 +10,9 @@ import (
 )
 
 func (c *Client) AddBackends(ctx context.Context, listenerID string, backends common.ELBBackendRequest) (common.ELBBackendList, error) {
+	if listenerID == "" {
+		return nil, errors.New("listener id is required")
+	}
 	backendMap := map[string]bool{}
 	for _, backend := range backends {
 		backendMap[backend.Address] = false
@@ -47,6 +51,9 @@ func (c *Client) AddBackends(ctx context.Context, listenerID string, backends co
 }
 
 func (c *Client) RemoveBackend(ctx context.Context, listenerID string, backendID string) error {
+	if listenerID == "" || backendID == "" {
+		return errors.New("listener id and backend id is required")
+	}
 	job := common.LoadBalancerJobInfo{}
 	input := map[string][]map[string]string{}
 	input["removeMember"] = []map[string]string{
@@ -68,6 +75,9 @@ func (c *Client) RemoveBackend(ctx context.Context, listenerID string, backendID
 }
 
 func (c *Client) GetBackends(ctx context.Context, listenerID string) ([]*common.ELBBackendListItem, error) {
+	if listenerID == "" {
+		return nil, errors.New("listener id and backend id is required")
+	}
 	rtn := []*common.ELBBackendListItem{}
 	if _, err := c.DoRequest(
 		ctx,

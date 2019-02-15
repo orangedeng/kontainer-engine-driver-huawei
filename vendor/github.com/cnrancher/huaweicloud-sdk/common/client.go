@@ -107,17 +107,12 @@ func (c *Client) DoRequest(ctx context.Context, method, url string, input, outpu
 	// }
 
 	if !requestOK {
-		logrus.Debugf("response raw data: %s", string(byteData))
+		logrus.Debugf("response status code %d, raw data: %s", resp.StatusCode, string(byteData))
 		einfo := ErrorInfo{}
 		if err = json.Unmarshal(byteData, &einfo); err != nil {
 			return nil, errors.Wrap(err, "error when unmarshaling error info of huawei api")
 		}
 		einfo.StatusCode = resp.StatusCode
-		//to error v1
-		if einfo.ErrorV1 != nil {
-			einfo.Description = einfo.ErrorV1["message"].(string)
-			einfo.Code = einfo.ErrorV1["code"].(string)
-		}
 		return nil, &einfo
 	}
 

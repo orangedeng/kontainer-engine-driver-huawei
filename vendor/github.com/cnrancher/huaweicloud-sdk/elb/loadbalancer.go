@@ -2,6 +2,7 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -24,6 +25,9 @@ func (c *Client) GetLoadBalancers(ctx context.Context) (*common.LoadBalancerList
 }
 
 func (c *Client) GetLoadBalancer(ctx context.Context, id string) (*common.LoadBalancerInfo, error) {
+	if id == "" {
+		return nil, errors.New("loadbalancer id is required")
+	}
 	rtn := common.LoadBalancerInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -39,6 +43,9 @@ func (c *Client) GetLoadBalancer(ctx context.Context, id string) (*common.LoadBa
 }
 
 func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, request *common.UpdatableLoadBalancerAttribute) (*common.LoadBalancerInfo, error) {
+	if id == "" {
+		return nil, errors.New("loadbalancer id is required")
+	}
 	rtn := common.LoadBalancerInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -54,6 +61,9 @@ func (c *Client) UpdateLoadBalancer(ctx context.Context, id string, request *com
 }
 
 func (c *Client) DeleteLoadBalancer(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("loadbalancer id is required")
+	}
 	job := common.LoadBalancerJobInfo{}
 	_, err := c.DoRequest(
 		ctx,

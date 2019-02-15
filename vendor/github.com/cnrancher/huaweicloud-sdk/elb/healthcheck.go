@@ -2,6 +2,7 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/cnrancher/huaweicloud-sdk/common"
@@ -22,6 +23,9 @@ func (c *Client) CreateHealthcheck(ctx context.Context, input *common.ELBHealthC
 }
 
 func (c *Client) DeleteHealthcheck(ctx context.Context, healthcheckID string) error {
+	if healthcheckID == "" {
+		return errors.New("healthcheck id is required")
+	}
 	if _, err := c.DoRequest(
 		ctx,
 		http.MethodDelete,
@@ -35,6 +39,9 @@ func (c *Client) DeleteHealthcheck(ctx context.Context, healthcheckID string) er
 }
 
 func (c *Client) UpdateHealthcheck(ctx context.Context, healthcheckID string, input *common.UpdatableELBHealthCheckAttribute) (*common.ELBHealthCheckInfo, error) {
+	if healthcheckID == "" {
+		return nil, errors.New("healthcheck id is required")
+	}
 	rtn := common.ELBHealthCheckInfo{}
 	if _, err := c.DoRequest(
 		ctx,
@@ -49,6 +56,9 @@ func (c *Client) UpdateHealthcheck(ctx context.Context, healthcheckID string, in
 }
 
 func (c *Client) GetHealthcheck(ctx context.Context, healthcheckID string) (*common.ELBHealthCheckInfo, error) {
+	if healthcheckID == "" {
+		return nil, errors.New("healthcheck id is required")
+	}
 	rtn := common.ELBHealthCheckInfo{}
 	if _, err := c.DoRequest(
 		ctx,

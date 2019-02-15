@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -45,10 +46,55 @@ type ClientInterface interface {
 
 //ErrorInfo Error message
 type ErrorInfo struct {
-	StatusCode  int                    `json:"-"`
-	Code        string                 `json:"code"`
-	Description string                 `json:"message"`
-	ErrorV1     map[string]interface{} `json:"error,omitempty"`
+	StatusCode  int             `json:"-"`
+	Code        string          `json:"code"`
+	Description string          `json:"message"`
+	ErrorV1     json.RawMessage `json:"error,omitempty"`
+}
+
+type ErrorInfoV1 struct {
+	Code    string `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+}
+
+type OddErrorInfo struct {
+	ErrorCode      string `json:"error_code,omitempty"`
+	ErrorMassage   string `json:"error_msg,omitempty"`
+	ErrorCodeInner string `json:"errorCode,omitempty"`
+	Reason         string `json:"reason,omitempty"`
+}
+
+func (err *ErrorInfo) UnmarshalJSON(b []byte) error {
+	errInfo := struct {
+		StatusCode  int             `json:"-"`
+		Code        string          `json:"code"`
+		Description string          `json:"message"`
+		ErrorV1     json.RawMessage `json:"error,omitempty"`
+	}{}
+	if err := json.Unmarshal(b, &errInfo); err != nil {
+		return err
+	}
+	*err = errInfo
+	if errInfo.Code != "" || errInfo.Description != "" {
+		return nil
+	}
+	if len(errInfo.ErrorV1) != 0 {
+		errv1 := ErrorInfoV1{}
+		if err := json.Unmarshal(errInfo.ErrorV1, &errv1); err != nil {
+			return err
+		}
+		err.Code = errv1.Code
+		err.Description = errv1.Message
+		err.ErrorV1 = nil
+		return nil
+	}
+	oddErrorInfo := OddErrorInfo{}
+	if err := json.Unmarshal(b, &oddErrorInfo); err != nil {
+		return err
+	}
+	err.Code = oddErrorInfo.ErrorCode
+	err.Description = oddErrorInfo.ErrorMassage
+	return nil
 }
 
 func (e *ErrorInfo) Error() string {

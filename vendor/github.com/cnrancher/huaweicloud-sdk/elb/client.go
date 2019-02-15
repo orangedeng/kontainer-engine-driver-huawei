@@ -2,6 +2,7 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -40,6 +41,9 @@ func prefix() string {
 }
 
 func (c *Client) WaitForELBJob(ctx context.Context, duration, timeout time.Duration, jobID string) (bool, *common.JobInfoV1, error) {
+	if jobID == "" {
+		return false, nil, errors.New("job id is required")
+	}
 	var lastJobInfo *common.JobInfoV1
 	err := common.CustomWaitForCompleteUntilTrue(ctx, duration, timeout, func(ictx context.Context) (bool, error) {
 		logrus.Infof("Querying job %s for %s", jobID, "elb")

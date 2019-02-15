@@ -2,6 +2,7 @@ package network
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/cnrancher/huaweicloud-sdk/common"
@@ -24,6 +25,9 @@ func (c *Client) CreateVPC(ctx context.Context, request *common.VpcRequest) (*co
 }
 
 func (c *Client) GetVPC(ctx context.Context, id string) (*common.VpcInfo, error) {
+	if id == "" {
+		return nil, errors.New("vpc id is required")
+	}
 	rtn := common.VpcInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -40,6 +44,9 @@ func (c *Client) GetVPC(ctx context.Context, id string) (*common.VpcInfo, error)
 }
 
 func (c *Client) DeleteVPC(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("vpc id is required")
+	}
 	_, err := c.DoRequest(
 		ctx,
 		http.MethodDelete,

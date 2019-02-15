@@ -2,6 +2,7 @@ package elb
 
 import (
 	"context"
+	"errors"
 	"net/http"
 
 	"github.com/cnrancher/huaweicloud-sdk/common"
@@ -38,6 +39,9 @@ func (c *Client) GetListeners(ctx context.Context) (*common.ELBListenerList, err
 }
 
 func (c *Client) GetListener(ctx context.Context, id string) (*common.ELBListenerInfo, error) {
+	if id == "" {
+		return nil, errors.New("listener id is required")
+	}
 	rtn := common.ELBListenerInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -53,6 +57,9 @@ func (c *Client) GetListener(ctx context.Context, id string) (*common.ELBListene
 }
 
 func (c *Client) UpdateListener(ctx context.Context, id string, request *common.UpdatableELBListenerAttribute) (*common.ELBListenerInfo, error) {
+	if id == "" {
+		return nil, errors.New("listener id is required")
+	}
 	rtn := common.ELBListenerInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -68,6 +75,9 @@ func (c *Client) UpdateListener(ctx context.Context, id string, request *common.
 }
 
 func (c *Client) DeleteListener(ctx context.Context, id string) error {
+	if id == "" {
+		return errors.New("listener id is required")
+	}
 	_, err := c.DoRequest(
 		ctx,
 		http.MethodDelete,

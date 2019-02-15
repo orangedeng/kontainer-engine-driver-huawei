@@ -11,6 +11,9 @@ import (
 )
 
 func (c *Client) AddNode(ctx context.Context, clusterid string, info *common.NodeInfo) (*common.NodeInfo, error) {
+	if clusterid == "" {
+		return nil, errors.New("clusterid is required")
+	}
 	rtn := common.NodeInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -26,6 +29,9 @@ func (c *Client) AddNode(ctx context.Context, clusterid string, info *common.Nod
 }
 
 func (c *Client) GetNodes(ctx context.Context, clusterid string) (*common.NodeListInfo, error) {
+	if clusterid == "" {
+		return nil, errors.New("clusterid is required")
+	}
 	rtn := common.NodeListInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -41,6 +47,9 @@ func (c *Client) GetNodes(ctx context.Context, clusterid string) (*common.NodeLi
 }
 
 func (c *Client) GetNode(ctx context.Context, clusterid, id string) (*common.NodeInfo, error) {
+	if clusterid == "" || id == "" {
+		return nil, errors.New("node id and cluster id are required")
+	}
 	rtn := common.NodeInfo{}
 	_, err := c.DoRequest(
 		ctx,
@@ -56,6 +65,9 @@ func (c *Client) GetNode(ctx context.Context, clusterid, id string) (*common.Nod
 }
 
 func (c *Client) DeleteNode(ctx context.Context, clusterid, id string) error {
+	if clusterid == "" || id == "" {
+		return errors.New("node id and cluster id are required")
+	}
 	_, err := c.DoRequest(
 		ctx,
 		http.MethodDelete,
@@ -70,6 +82,9 @@ func (c *Client) DeleteNode(ctx context.Context, clusterid, id string) error {
 }
 
 func (c *Client) DeleteNodes(ctx context.Context, clusterid string, count int) (int64, error) {
+	if clusterid == "" {
+		return 0, errors.New("cluster id are required")
+	}
 	var deletedCount int64
 	list, err := c.GetNodes(ctx, clusterid)
 	if err != nil {
